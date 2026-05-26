@@ -1,0 +1,20 @@
+# Environment — never commit real credentials
+.env
+
+# Maven build output
+target/
+
+# macOS metadata
+.DS_Store
+**/.DS_Store
+
+# First-run flag
+.setup_done
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
