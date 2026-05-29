@@ -20,14 +20,17 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public Optional<Product> getById(Long id) {
         return productRepository.findById(id);
     }
 
+    @SuppressWarnings("null")
     public Product save(Product product) {
         return productRepository.save(product);
     }
 
+    @SuppressWarnings("null")
     public Product update(Long id, Product updatedProduct) {
         Product existing = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
@@ -39,6 +42,7 @@ public class ProductService {
         return productRepository.save(existing);
     }
 
+    @SuppressWarnings("null")
     public void delete(Long id) {
         productRepository.deleteById(id);
     }

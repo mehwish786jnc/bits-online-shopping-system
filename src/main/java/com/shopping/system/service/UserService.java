@@ -59,6 +59,7 @@ public class UserService {
     }
 
     // Used by CustomerController after profile update — persists changed fields
+    @SuppressWarnings("null")
     public User save(User user) {
         return userRepository.save(user);
     }
