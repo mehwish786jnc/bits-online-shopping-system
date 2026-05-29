@@ -1,11 +1,11 @@
-// Owner: Mehwish | Customer Dashboard | JpaRepository for order lookup and stats queries
+// Owner: HeenuReet | Ordering | JpaRepository for order queries including sales analysis
 package com.shopping.system.repository;
 
 import com.shopping.system.entity.Order;
-import com.shopping.system.entity.OrderStatus;
 import com.shopping.system.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -15,16 +15,28 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    // Used by customer dashboard — ordered desc so stream().limit(5) gets the 5 most recent
-    List<Order> findByUserOrderByOrderDateDesc(User user);
+    List<Order> findByUser(User user);
 
-    long countByUser(User user);
+    List<Order> findByUserId(Long userId);
 
-    // Used by admin dashboard for today's sales
-    List<Order> findByOrderDateBetween(LocalDateTime start, LocalDateTime end);
+    List<Order> findByUserIdOrderByOrderDateDesc(Long userId);
 
-    List<Order> findByStatus(OrderStatus status);
+    @Query("SELECT o FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate ORDER BY o.orderDate DESC")
+    List<Order> findOrdersBetweenDates(@Param("startDate") LocalDateTime startDate,
+                                       @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.orderDate BETWEEN :start AND :end")
-    BigDecimal sumTotalAmountByOrderDateBetween(LocalDateTime start, LocalDateTime end);
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate AND o.status != com.shopping.system.entity.OrderStatus.CANCELLED")
+    BigDecimal findTotalSalesBetweenDates(@Param("startDate") LocalDateTime startDate,
+                                          @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT oi.product, SUM(oi.quantity) as totalQty FROM OrderItem oi " +
+           "JOIN oi.order o WHERE o.status != com.shopping.system.entity.OrderStatus.CANCELLED " +
+           "GROUP BY oi.product ORDER BY totalQty DESC")
+    List<Object[]> findTopSellingProducts();
+
+    @Query("SELECT COUNT(o) FROM Order o WHERE DATE(o.orderDate) = CURRENT_DATE AND o.status != com.shopping.system.entity.OrderStatus.CANCELLED")
+    long countTodaysOrders();
+
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE DATE(o.orderDate) = CURRENT_DATE AND o.status != com.shopping.system.entity.OrderStatus.CANCELLED")
+    BigDecimal findTodaysTotalSales();
 }
