@@ -1,4 +1,4 @@
-// Owner: Mehwish | Customer Dashboard | Enum for order lifecycle states
+// Owner: HeenuReet | Ordering | Enum for order states
 package com.shopping.system.entity;
 
 public enum OrderStatus {
